@@ -5,7 +5,7 @@ import os
 from loguru import logger
 
 # Importiere lokale Module
-from config.config import config
+from config import config
 from src.models import db, Subscriber, Document, DocumentChange, Newsletter
 from src.scheduler import TaskScheduler
 from src.email_service import EmailService
