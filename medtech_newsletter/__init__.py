@@ -3,7 +3,7 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from loguru import logger
-from sqlalchemy import text # Datenbank-Fix
+from sqlalchemy import text
 
 # Importiere lokale Module RELATIV zum Paket
 from .config import config
@@ -16,7 +16,6 @@ from .analyzer import DocumentAnalyzer
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
 
-    # HIER IST DIE ÄNDERUNG für die statischen Dateien
     app = Flask(__name__, template_folder='templates', static_folder='static')
 
     # Konfiguration laden
@@ -51,10 +50,19 @@ def create_app(config_name='development'):
 
     @app.route('/')
     def index():
-        """Hauptseite mit Anmeldeformular"""
+        """NEU: Leitet zur Login-Seite weiter"""
+        return redirect(url_for('login'))
+
+    @app.route('/login')
+    def login():
+        """NEU: Zeigt die Login-Seite an"""
+        return render_template('login.html')
+
+    @app.route('/registrieren')
+    def register_page():
+        """NEU: Zeigt die Registrierungsseite an"""
         return render_template('index.html')
 
-    # ... (alle anderen Routen bleiben unverändert)
     @app.route('/subscribe', methods=['POST'])
     def subscribe():
         """Neue Abonnenten registrieren"""
@@ -156,6 +164,23 @@ def create_app(config_name='development'):
         }
         
         return render_template('admin.html', stats=stats)
+    
+    # NEUE ROUTE ZUM LÖSCHEN VON ABONNENTEN
+    @app.route('/admin/subscriber/delete/<int:subscriber_id>', methods=['POST'])
+    def delete_subscriber(subscriber_id):
+        """Löscht einen Abonnenten aus der Datenbank."""
+        try:
+            subscriber = Subscriber.query.get(subscriber_id)
+            if subscriber:
+                db.session.delete(subscriber)
+                db.session.commit()
+                logger.info(f"Abonnent mit ID {subscriber_id} gelöscht.")
+                return jsonify({'message': 'Abonnent erfolgreich gelöscht'}), 200
+            return jsonify({'error': 'Abonnent nicht gefunden'}), 404
+        except Exception as e:
+            logger.error(f"Fehler beim Löschen von Abonnent {subscriber_id}: {e}")
+            return jsonify({'error': 'Ein interner Fehler ist aufgetreten'}), 500
+
 
     @app.route('/admin/manual-scraping', methods=['POST'])
     def manual_scraping():
@@ -186,69 +211,4 @@ def create_app(config_name='development'):
     @app.route('/admin/documents')
     def admin_documents():
         """Liste aller überwachten Dokumente"""
-        documents = Document.query.order_by(Document.last_checked.desc()).limit(100).all()
-        return jsonify([doc.to_dict() for doc in documents])
-
-    @app.route('/admin/changes')
-    def admin_changes():
-        """Liste aller erkannten Änderungen"""
-        changes = DocumentChange.query.order_by(DocumentChange.detected_at.desc()).limit(50).all()
-        return jsonify([change.to_dict() for change in changes])
-
-    @app.route('/admin/newsletters')
-    def admin_newsletters():
-        """Liste aller generierten Newsletter"""
-        newsletters = Newsletter.query.order_by(Newsletter.generated_at.desc()).limit(20).all()
-        return jsonify([nl.to_dict() for nl in newsletters])
-
-    @app.route('/newsletter/<int:newsletter_id>')
-    def view_newsletter(newsletter_id):
-        """Zeigt einen spezifischen Newsletter an"""
-        newsletter = Newsletter.query.get_or_404(newsletter_id)
-        return newsletter.content_html
-
-    @app.route('/api/status')
-    def api_status():
-        """API-Status-Endpoint"""
-        return jsonify({
-            'status': 'running',
-            'timestamp': datetime.utcnow().isoformat(),
-            'scheduler_running': scheduler.scheduler.running if scheduler else False
-        })
-
-    @app.route('/health')
-    def health_check():
-        """Health-Check-Endpoint"""
-        try:
-            db.session.execute(text('SELECT 1')) # Datenbank-Fix
-            email_configured = email_service.test_email_configuration()
-            return jsonify({
-                'status': 'healthy',
-                'database': 'connected',
-                'email': 'configured' if email_configured else 'not_configured',
-                'timestamp': datetime.utcnow().isoformat()
-            }), 200
-            
-        except Exception as e:
-            logger.error(f"Health-Check fehlgeschlagen: {e}")
-            return jsonify({
-                'status': 'unhealthy',
-                'error': str(e),
-                'timestamp': datetime.utcnow().isoformat()
-            }), 500
-
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({'error': 'Seite nicht gefunden'}), 404
-
-    @app.errorhandler(500)
-    def internal_error(error):
-        logger.error(f"Interner Serverfehler: {error}")
-        return jsonify({'error': 'Interner Serverfehler'}), 500
-
-    # Scheduler starten (nur in Produktionsumgebung)
-    if config_name == 'production' or os.environ.get('START_SCHEDULER', 'false').lower() == 'true':
-        scheduler.start_scheduler()
-        logger.info("Scheduler gestartet")
-
-    return app
+        documents = Document.query.order_by(Document
