@@ -15,7 +15,7 @@ from analyzer import DocumentAnalyzer
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
     
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
     
     # Konfiguration laden
     app.config.from_object(config[config_name])
