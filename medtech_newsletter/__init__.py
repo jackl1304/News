@@ -3,6 +3,7 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 from loguru import logger
+from sqlalchemy import text # Datenbank-Fix
 
 # Importiere lokale Module RELATIV zum Paket
 from .config import config
@@ -15,8 +16,8 @@ from .analyzer import DocumentAnalyzer
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
 
-    # Explizit den template_folder setzen für mehr Robustheit
-    app = Flask(__name__, template_folder='templates')
+    # HIER IST DIE ÄNDERUNG für die statischen Dateien
+    app = Flask(__name__, template_folder='templates', static_folder='static')
 
     # Konfiguration laden
     app.config.from_object(config[config_name])
@@ -53,6 +54,7 @@ def create_app(config_name='development'):
         """Hauptseite mit Anmeldeformular"""
         return render_template('index.html')
 
+    # ... (alle anderen Routen bleiben unverändert)
     @app.route('/subscribe', methods=['POST'])
     def subscribe():
         """Neue Abonnenten registrieren"""
@@ -218,7 +220,7 @@ def create_app(config_name='development'):
     def health_check():
         """Health-Check-Endpoint"""
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1')) # Datenbank-Fix
             email_configured = email_service.test_email_configuration()
             return jsonify({
                 'status': 'healthy',
