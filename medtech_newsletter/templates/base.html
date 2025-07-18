@@ -5,38 +5,66 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('login') }}">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fas fa-heartbeat me-2"></i>
                 Medizintechnik Newsletter
             </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register_page') }}">
-                            <i class="fas fa-user-plus me-1"></i>Registrieren
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
-                            <i class="fas fa-cog me-1"></i>Admin
-                        </a>
-                    </li>
-                    {% if session.logged_in %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
-                            <i class="fas fa-sign-out-alt me-1"></i>Abmelden
-                        </a>
-                    </li>
+                    {% if session.user_id %}
+                        <li class="nav-item"><span class="navbar-text me-3">Hallo, {{ session.user_email }}</span></li>
+                        {% if session.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="admin-link">
+                                <i class="fas fa-cog me-1"></i>Admin
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-1"></i>Abmelden
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Anmelden
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">
+                                <i class="fas fa-user-plus me-1"></i>Registrieren
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-
-    </body>
+    <main class="container my-5">
+        {% block content %}{% endblock %}
+    </main>
+    {% block scripts %}
+        {% if session.is_admin %}
+        <script>
+            document.getElementById('admin-link').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const password = prompt("Bitte geben Sie Ihr Admin-Passwort zur Bestätigung ein:");
+                if (password) {
+                    const response = await fetch('/admin/verify_password', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ password: password })
+                    });
+                    if (response.ok) {
+                        window.location.href = "{{ url_for('admin_dashboard') }}";
+                    } else {
+                        alert("Passwort-Bestätigung fehlgeschlagen!");
+                    }
+                }
+            });
+        </script>
+        {% endif %}
+    {% endblock %}
+</body>
 </html>
