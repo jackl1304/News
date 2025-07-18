@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Newsletter abbestellen - Medizintechnik Newsletter{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="text-center mb-4">
+            <h1 class="h2 text-muted">
+                <i class="fas fa-user-minus me-2"></i>
+                Newsletter abbestellen
+            </h1>
+            <p class="text-muted">
+                Schade, dass Sie uns verlassen möchten. Sie können sich jederzeit wieder anmelden.
+            </p>
+        </div>
+
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
+                <form id="unsubscribeForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>
+                            E-Mail-Adresse
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" required 
+                               placeholder="Ihre E-Mail-Adresse eingeben">
+                        <div class="form-text">
+                            Geben Sie die E-Mail-Adresse ein, mit der Sie sich angemeldet haben.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Abmelden
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="text-muted mb-2">Doch nicht abmelden?</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Zurück zur Anmeldung
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Erfolgreich abgemeldet
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sie wurden erfolgreich vom Newsletter abgemeldet.</p>
+                <p class="mb-0">Sie erhalten eine Bestätigungs-E-Mail und keine weiteren Newsletter von uns.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Verstanden</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('unsubscribeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    const data = {
+        email: formData.get('email')
+    };
+    
+    // Button deaktivieren
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Wird verarbeitet...';
+    
+    try {
+        const response = await fetch('/unsubscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Erfolg
+            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+            modal.show();
+            this.reset();
+        } else {
+            // Fehler
+            alert('Fehler: ' + result.error);
+        }
+    } catch (error) {
+        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+    } finally {
+        // Button wieder aktivieren
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+</script>
+{% endblock %}
+
