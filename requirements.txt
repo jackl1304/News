@@ -48,7 +48,7 @@ bleach==6.1.0
 Flask
 Flask-SQLAlchemy
 psycopg2-binary
-gunicorn  <-- DIESE ZEILE IST ENTSCHEIDEND
+gunicorn 
 loguru
 python-dotenv
 spacy
