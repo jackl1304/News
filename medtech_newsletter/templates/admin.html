@@ -26,8 +26,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title" id="stats-total-subscribers">{{ stats.total_subscribers }}</h4>
-                        <p class="card-text">Aktive Abonnenten</p>
+                        <h4 class="card-title">{{ stats.total_subscribers }}</h4>
+                        <p class="card-text">Benutzer</p>
                     </div>
                     <div class="align-self-center">
                         <i class="fas fa-users fa-2x opacity-75"></i>
@@ -42,7 +42,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title" id="stats-total-documents">{{ stats.total_documents }}</h4>
+                        <h4 class="card-title">{{ stats.total_documents }}</h4>
                         <p class="card-text">Überwachte Dokumente</p>
                     </div>
                     <div class="align-self-center">
@@ -58,7 +58,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title" id="stats-pending-changes">{{ stats.pending_changes }}</h4>
+                        <h4 class="card-title">{{ stats.pending_changes }}</h4>
                         <p class="card-text">Unverarbeitete Änderungen</p>
                     </div>
                     <div class="align-self-center">
@@ -74,7 +74,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h4 class="card-title" id="stats-recent-newsletters">{{ stats.recent_newsletters|length }}</h4>
+                        <h4 class="card-title">{{ stats.recent_newsletters|length }}</h4>
                         <p class="card-text">Letzte Newsletter</p>
                     </div>
                     <div class="align-self-center">
@@ -86,35 +86,19 @@
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-clock me-2"></i>
-                    Scheduler Status
-                </h5>
-            </div>
-            <div class="card-body">
-                </div>
-        </div>
-    </div>
-</div>
-
-
 <div class="row">
     <div class="col-md-4 mb-3">
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">
                     <i class="fas fa-users me-2"></i>
-                    Abonnenten verwalten
+                    Benutzer verwalten
                 </h6>
             </div>
             <div class="card-body">
-                <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="loadSubscribers()">
+                <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="loadUsers()">
                     <i class="fas fa-list me-1"></i>
-                    Alle Abonnenten anzeigen
+                    Alle Benutzer anzeigen
                 </button>
             </div>
         </div>
@@ -166,111 +150,4 @@
                 <h5 class="modal-title" id="dataModalTitle">Daten</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="dataModalBody">
-                <div class="text-center">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Lädt...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // ... (manualScraping, manualNewsletter, deleteSubscriber bleiben gleich) ...
-
-    async function showModalWithTable(endpoint, title, createTableFunction) {
-        const modal = new bootstrap.Modal(document.getElementById('dataModal'));
-        document.getElementById('dataModalTitle').textContent = title;
-        const modalBody = document.getElementById('dataModalBody');
-        modalBody.innerHTML = `<div class="text-center"><div class="spinner-border"></div></div>`;
-        modal.show();
-
-        try {
-            const response = await fetch(endpoint);
-            const data = await response.json();
-            
-            if (response.ok) {
-                if (data.length === 0) {
-                    modalBody.innerHTML = `<p class="text-muted">Keine Einträge gefunden.</p>`;
-                    return;
-                }
-                modalBody.innerHTML = createTableFunction(data);
-            } else {
-                modalBody.innerHTML = `<div class="alert alert-danger">Fehler: ${data.error}</div>`;
-            }
-        } catch (error) {
-            modalBody.innerHTML = `<div class="alert alert-danger">Netzwerkfehler: ${error.message}</div>`;
-        }
-    }
-
-    function loadSubscribers() {
-        showModalWithTable('/admin/subscribers', 'Alle Abonnenten', (data) => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>E-Mail</th><th>Name</th><th>Status</th><th>Registriert</th><th>Aktionen</th></tr></thead><tbody>`;
-            data.forEach(sub => {
-                table += `<tr>
-                    <td>${sub.id}</td>
-                    <td>${sub.email}</td>
-                    <td>${sub.name || '-'}</td>
-                    <td>${sub.is_active ? '<span class="badge bg-success">Aktiv</span>' : '<span class="badge bg-danger">Inaktiv</span>'}</td>
-                    <td>${new Date(sub.created_at).toLocaleString('de-DE')}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="deleteSubscriber(${sub.id})"><i class="fas fa-trash-alt"></i></button></td>
-                </tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-
-    function loadDocuments() {
-        showModalWithTable('/admin/documents', 'Überwachte Dokumente', (data) => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Quelle</th><th>Titel</th><th>URL</th><th>Zuletzt geprüft</th></tr></thead><tbody>`;
-            data.forEach(doc => {
-                table += `<tr>
-                    <td>${doc.id}</td>
-                    <td>${doc.source}</td>
-                    <td>${doc.title}</td>
-                    <td><a href="${doc.url}" target="_blank" rel="noopener noreferrer">Link</a></td>
-                    <td>${new Date(doc.last_checked).toLocaleString('de-DE')}</td>
-                </tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-
-    function loadChanges() {
-        showModalWithTable('/admin/changes', 'Erkannte Änderungen', (data) => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Doc ID</th><th>Zusammenfassung</th><th>Wichtigkeit</th><th>Verarbeitet</th><th>Entdeckt am</th></tr></thead><tbody>`;
-            data.forEach(change => {
-                table += `<tr>
-                    <td>${change.id}</td>
-                    <td>${change.document_id}</td>
-                    <td>${change.change_summary}</td>
-                    <td>${change.importance_score}</td>
-                    <td>${change.processed ? 'Ja' : 'Nein'}</td>
-                    <td>${new Date(change.detected_at).toLocaleString('de-DE')}</td>
-                </tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-
-    function loadNewsletters() {
-        showModalWithTable('/admin/newsletters', 'Newsletter-Archiv', (data) => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Titel</th><th>Empfänger</th><th>Erstellt am</th><th>Aktionen</th></tr></thead><tbody>`;
-            data.forEach(nl => {
-                table += `<tr>
-                    <td>${nl.id}</td>
-                    <td>${nl.title}</td>
-                    <td>${nl.recipient_count}</td>
-                    <td>${new Date(nl.generated_at).toLocaleString('de-DE')}</td>
-                    <td><a href="/newsletter/${nl.id}" class="btn btn-sm btn-outline-primary" target="_blank">Anzeigen</a></td>
-                </tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-</script>
-{% endblock %}
+            <div class="modal-body"
