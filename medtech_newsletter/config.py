@@ -1,18 +1,3 @@
-Ja, verstanden. Wir integrieren diese neuen Quellen jetzt in die Konfiguration des Projekts, damit der Scraper sie automatisch abfragen kann.
-
-Ich habe die relevantesten offiziellen Quellen aus deiner Liste ausgewählt, die sich gut für eine automatisierte Abfrage eignen. Dazu gehören Destatis, Eurostat und die EZB.
-
-Die Änderungen nehmen wir in der Datei **`medtech_newsletter/config.py`** vor.
-
------
-
-### Komplette, aktualisierte `config.py`
-
-Hier ist die vollständige, aktualisierte Konfigurationsdatei. Ich habe die `SOURCES`-Sektion erweitert, um die neuen, wichtigen europäischen und deutschen Behörden aufzunehmen.
-
-Ersetze den Inhalt deiner `medtech_newsletter/config.py`-Datei mit diesem Code und lade die Änderung auf GitHub hoch.
-
-```python
 import os
 from dotenv import load_dotenv
 
@@ -32,15 +17,15 @@ class Config:
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('deltawaysnewsletter@gmail.com')
-    MAIL_PASSWORD = os.environ.get('7724@Serpha')
-    MAIL_DEFAULT_SENDER = os.environ.get('deltawaysnewsletter@gmail.com')
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     
     # Scraping Konfiguration
     SCRAPING_INTERVAL_HOURS = int(os.environ.get('SCRAPING_INTERVAL_HOURS') or 24)
     NEWSLETTER_GENERATION_INTERVAL_HOURS = int(os.environ.get('NEWSLETTER_GENERATION_INTERVAL_HOURS') or 168)  # Wöchentlich
     
-    # Quellen Konfiguration - ERWEITERT
+    # Quellen Konfiguration
     SOURCES = {
         'DESTATIS': {
             'base_url': 'https://www.destatis.de',
@@ -97,4 +82,3 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
-```
