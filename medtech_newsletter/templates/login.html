@@ -7,13 +7,13 @@
     <div class="col-md-6 col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <h2 class="card-title text-center mb-4">Anmelden</h2>
+                <h2 class="card-title text-center mb-4">Admin-Login</h2>
                 
-                <form>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Benutzername</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form action="{{ url_for('login') }}" method="post">
                     <div class="mb-3">
                         <label for="password" class="form-label">Passwort</label>
                         <input type="password" class="form-control" id="password" name="password" required>
@@ -21,10 +21,10 @@
                     <div class="d-grid mb-3">
                         <button type="submit" class="btn btn-primary">Anmelden</button>
                     </div>
-                    <p class="text-center text-muted mb-0">
-                        Noch kein Konto? <a href="{{ url_for('register_page') }}">Jetzt registrieren</a>
-                    </p>
                 </form>
+                <p class="text-center text-muted mb-0">
+                    Zurück zur <a href="{{ url_for('register_page') }}">Registrierung</a>
+                </p>
             </div>
         </div>
     </div>
