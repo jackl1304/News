@@ -1,0 +1,33 @@
+# render.yaml - Blaupause für Medizintechnik Newsletter AI
+
+databases:
+  - name: medtech-db
+    databaseName: medtech_db
+    user: medtech_user
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: medtech-newsletter
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m spacy download de_core_news_sm
+      python -m spacy download en_core_web_sm
+    startCommand: "gunicorn 'app:create_app(\"production\")'"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medtech-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: FLASK_ENV
+        value: production
+      - key: START_SCHEDULER
+        value: true
+      - key: SECRET_KEY
+        generateValue: true
