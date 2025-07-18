@@ -150,4 +150,118 @@
                 <h5 class="modal-title" id="dataModalTitle">Daten</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body"
+            <div class="modal-body" id="dataModalBody">
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Manuelle Aktionen (bleiben unverändert)
+    async function manualScraping() {
+        if (!confirm('Manuelles Scraping starten?')) return;
+        const response = await fetch('/admin/manual-scraping', { method: 'POST' });
+        const result = await response.json();
+        alert(result.message || result.error);
+    }
+
+    async function manualNewsletter() {
+        if (!confirm('Newsletter-Generierung starten?')) return;
+        const response = await fetch('/admin/manual-newsletter', { method: 'POST' });
+        const result = await response.json();
+        alert(result.message || result.error);
+    }
+    
+    // Generische Funktion, um Daten zu laden und in einer Tabelle im Modal anzuzeigen
+    async function showModalWithTable(endpoint, title, createTableFunction) {
+        const modal = new bootstrap.Modal(document.getElementById('dataModal'));
+        document.getElementById('dataModalTitle').textContent = title;
+        const modalBody = document.getElementById('dataModalBody');
+        modalBody.innerHTML = `<div class="text-center"><div class="spinner-border"></div></div>`;
+        modal.show();
+
+        try {
+            const response = await fetch(endpoint);
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (data.length === 0) {
+                    modalBody.innerHTML = `<p class="text-muted">Keine Einträge gefunden.</p>`;
+                    return;
+                }
+                modalBody.innerHTML = createTableFunction(data);
+            } else {
+                modalBody.innerHTML = `<div class="alert alert-danger">Fehler: ${data.error}</div>`;
+            }
+        } catch (error) {
+            modalBody.innerHTML = `<div class="alert alert-danger">Netzwerkfehler: ${error.message}</div>`;
+        }
+    }
+
+    // Spezifische Funktionen für jeden Button
+    function loadUsers() {
+        showModalWithTable('/admin/subscribers', 'Alle Benutzer', (data) => {
+            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>E-Mail</th><th>Admin</th><th>Registriert</th></tr></thead><tbody>`;
+            data.forEach(user => {
+                table += `<tr>
+                    <td>${user.id}</td>
+                    <td>${user.email}</td>
+                    <td>${user.is_admin ? '<span class="badge bg-success">Ja</span>' : '<span class="badge bg-secondary">Nein</span>'}</td>
+                    <td>${new Date(user.created_at).toLocaleString('de-DE')}</td>
+                </tr>`;
+            });
+            return table + `</tbody></table></div>`;
+        });
+    }
+
+    function loadDocuments() {
+        showModalWithTable('/admin/documents', 'Überwachte Dokumente', (data) => {
+            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Quelle</th><th>Titel</th><th>URL</th><th>Zuletzt geprüft</th></tr></thead><tbody>`;
+            data.forEach(doc => {
+                table += `<tr>
+                    <td>${doc.id}</td>
+                    <td><a href="${doc.source}" target="_blank">${new URL(doc.source).hostname}</a></td>
+                    <td>${doc.title}</td>
+                    <td><a href="${doc.url}" target="_blank">Link</a></td>
+                    <td>${new Date(doc.last_checked).toLocaleString('de-DE')}</td>
+                </tr>`;
+            });
+            return table + `</tbody></table></div>`;
+        });
+    }
+
+    function loadChanges() {
+        showModalWithTable('/admin/changes', 'Erkannte Änderungen', (data) => {
+            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Doc ID</th><th>Zusammenfassung</th><th>Status</th><th>Entdeckt</th></tr></thead><tbody>`;
+            data.forEach(change => {
+                table += `<tr>
+                    <td>${change.id}</td>
+                    <td>${change.document_id}</td>
+                    <td>${change.change_summary}</td>
+                    <td>${change.processed ? '<span class="badge bg-secondary">Verarbeitet</span>' : '<span class="badge bg-warning">Neu</span>'}</td>
+                    <td>${new Date(change.detected_at).toLocaleString('de-DE')}</td>
+                </tr>`;
+            });
+            return table + `</tbody></table></div>`;
+        });
+    }
+
+    function loadNewsletters() {
+        showModalWithTable('/admin/newsletters', 'Newsletter-Archiv', (data) => {
+            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Titel</th><th>Empfänger</th><th>Erstellt</th><th>Aktionen</th></tr></thead><tbody>`;
+            data.forEach(nl => {
+                table += `<tr>
+                    <td>${nl.id}</td>
+                    <td>${nl.title}</td>
+                    <td>${nl.recipient_count}</td>
+                    <td>${new Date(nl.generated_at).toLocaleString('de-DE')}</td>
+                    <td><a href="/newsletter/${nl.id}" class="btn btn-sm btn-outline-primary" target="_blank">Anzeigen</a></td>
+                </tr>`;
+            });
+            return table + `</tbody></table></div>`;
+        });
+    }
+</script>
+{% endblock %}
