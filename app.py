@@ -5,12 +5,12 @@ import os
 from loguru import logger
 
 # Importiere lokale Module
-from config import config
-from models import db, Subscriber, Document, DocumentChange, Newsletter
-from scheduler import TaskScheduler
-from email_service import EmailService
-from newsletter_generator import NewsletterGenerator
-from analyzer import DocumentAnalyzer
+from medtech_newsletter.config import config
+from medtech_newsletter.models import db
+from medtech_newsletter.scheduler import TaskScheduler
+from medtech_newsletter.email_service import EmailService
+from medtech_newsletter.newsletter_generator import NewsletterGenerator
+from medtech_newsletter.analyzer import DocumentAnalyzer
 
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
