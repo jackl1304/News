@@ -1,1 +1,90 @@
+/* style.css - Modernes Design für die Newsletter App */
 
+/* Allgemeine Stile und Farbpalette */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --light-gray: #f8f9fa;
+    --border-radius: 0.5rem;
+}
+
+body {
+    background-color: var(--light-gray);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex-grow: 1;
+}
+
+/* Navbar-Anpassungen */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* Karten-Styling für Formulare und Dashboard */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card-title {
+    font-weight: 600;
+    color: #212529;
+}
+
+/* Button-Styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Formular-Styling */
+.form-control {
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: var(--primary-color);
+}
+
+/* Footer-Styling */
+footer {
+    background-color: #e9ecef;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Admin Dashboard Modal Anpassungen */
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.table-responsive {
+    max-height: 60vh;
+}
