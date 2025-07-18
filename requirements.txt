@@ -44,3 +44,14 @@ bleach==6.1.0
 
 # Diff utilities (using built-in difflib)
 
+# requirements.txt
+Flask
+Flask-SQLAlchemy
+psycopg2-binary
+gunicorn  <-- DIESE ZEILE IST ENTSCHEIDEND
+loguru
+python-dotenv
+spacy
+requests
+# ... und alle anderen Pakete
+
