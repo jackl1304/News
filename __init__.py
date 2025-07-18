@@ -5,17 +5,17 @@ import os
 from loguru import logger
 
 # Importiere lokale Module
-from config.config import config
-from src.models import db, Subscriber, Document, DocumentChange, Newsletter
-from src.scheduler import TaskScheduler
-from src.email_service import EmailService
-from src.newsletter_generator import NewsletterGenerator
-from src.analyzer import DocumentAnalyzer
+from medtech_newsletter.config import config
+from medtech_newsletter.models import db
+from medtech_newsletter.scheduler import TaskScheduler
+from medtech_newsletter.email_service import EmailService
+from medtech_newsletter.newsletter_generator import NewsletterGenerator
+from medtech_newsletter.analyzer import DocumentAnalyzer
 
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
     
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
     
     # Konfiguration laden
     app.config.from_object(config[config_name])
@@ -278,4 +278,3 @@ if __name__ == '__main__':
         port=int(os.environ.get('PORT', 5000)),
         debug=(config_name == 'development')
     )
-
