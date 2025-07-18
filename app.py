@@ -6,11 +6,11 @@ from loguru import logger
 
 # Importiere lokale Module
 from config import config
-from src.models import db, Subscriber, Document, DocumentChange, Newsletter
-from src.scheduler import TaskScheduler
-from src.email_service import EmailService
-from src.newsletter_generator import NewsletterGenerator
-from src.analyzer import DocumentAnalyzer
+from models import db, Subscriber, Document, DocumentChange, Newsletter
+from scheduler import TaskScheduler
+from email_service import EmailService
+from newsletter_generator import NewsletterGenerator
+from analyzer import DocumentAnalyzer
 
 def create_app(config_name='development'):
     """Factory-Funktion zur Erstellung der Flask-App"""
