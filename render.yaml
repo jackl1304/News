@@ -19,7 +19,7 @@ services:
       python -m spacy download en_core_web_sm
     startCommand: "gunicorn 'medtech_newsletter.app:create_app("production")'
     envVars:
-      - key: DATABASE_URL
+      - key: PYTHONPATH
         fromDatabase:
           name: medtech-db
           property: connectionString
