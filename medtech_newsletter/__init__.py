@@ -50,17 +50,17 @@ def create_app(config_name='development'):
 
     @app.route('/')
     def index():
-        """NEU: Leitet zur Login-Seite weiter"""
+        """Leitet zur Login-Seite weiter"""
         return redirect(url_for('login'))
 
     @app.route('/login')
     def login():
-        """NEU: Zeigt die Login-Seite an"""
+        """Zeigt die Login-Seite an"""
         return render_template('login.html')
 
     @app.route('/registrieren')
     def register_page():
-        """NEU: Zeigt die Registrierungsseite an"""
+        """Zeigt die Registrierungsseite an"""
         return render_template('index.html')
 
     @app.route('/subscribe', methods=['POST'])
@@ -122,93 +122,4 @@ def create_app(config_name='development'):
             email = data.get('email', '').strip().lower()
             
             if not email:
-                return jsonify({'error': 'E-Mail-Adresse ist erforderlich'}), 400
-            
-            subscriber = Subscriber.query.filter_by(email=email).first()
-            if not subscriber:
-                return jsonify({'error': 'E-Mail-Adresse nicht gefunden'}), 404
-            
-            if not subscriber.is_active:
-                return jsonify({'error': 'Sie sind bereits abgemeldet'}), 400
-            
-            subscriber.is_active = False
-            subscriber.updated_at = datetime.utcnow()
-            db.session.commit()
-            
-            email_service.send_unsubscribe_confirmation(email, subscriber.name)
-            
-            logger.info(f"Abonnent abgemeldet: {email}")
-            
-            return jsonify({'message': 'Erfolgreich abgemeldet!'}), 200
-            
-        except Exception as e:
-            logger.error(f"Fehler bei Abmeldung: {e}")
-            return jsonify({'error': 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.'}), 500
-
-    @app.route('/admin')
-    def admin_dashboard():
-        """Admin-Dashboard"""
-        total_subscribers = Subscriber.query.filter_by(is_active=True).count()
-        total_documents = Document.query.count()
-        recent_changes = DocumentChange.query.filter_by(processed=False).count()
-        recent_newsletters = Newsletter.query.order_by(Newsletter.generated_at.desc()).limit(5).all()
-        
-        job_status = scheduler.get_job_status()
-        
-        stats = {
-            'total_subscribers': total_subscribers,
-            'total_documents': total_documents,
-            'pending_changes': recent_changes,
-            'recent_newsletters': [nl.to_dict() for nl in recent_newsletters],
-            'scheduler_status': job_status
-        }
-        
-        return render_template('admin.html', stats=stats)
-    
-    # NEUE ROUTE ZUM LÖSCHEN VON ABONNENTEN
-    @app.route('/admin/subscriber/delete/<int:subscriber_id>', methods=['POST'])
-    def delete_subscriber(subscriber_id):
-        """Löscht einen Abonnenten aus der Datenbank."""
-        try:
-            subscriber = Subscriber.query.get(subscriber_id)
-            if subscriber:
-                db.session.delete(subscriber)
-                db.session.commit()
-                logger.info(f"Abonnent mit ID {subscriber_id} gelöscht.")
-                return jsonify({'message': 'Abonnent erfolgreich gelöscht'}), 200
-            return jsonify({'error': 'Abonnent nicht gefunden'}), 404
-        except Exception as e:
-            logger.error(f"Fehler beim Löschen von Abonnent {subscriber_id}: {e}")
-            return jsonify({'error': 'Ein interner Fehler ist aufgetreten'}), 500
-
-
-    @app.route('/admin/manual-scraping', methods=['POST'])
-    def manual_scraping():
-        """Manuelles Scraping auslösen"""
-        try:
-            scheduler.run_manual_scraping()
-            return jsonify({'message': 'Scraping gestartet'}), 200
-        except Exception as e:
-            logger.error(f"Fehler beim manuellen Scraping: {e}")
-            return jsonify({'error': str(e)}), 500
-
-    @app.route('/admin/manual-newsletter', methods=['POST'])
-    def manual_newsletter():
-        """Manuelle Newsletter-Generierung auslösen"""
-        try:
-            scheduler.run_manual_newsletter_generation()
-            return jsonify({'message': 'Newsletter-Generierung gestartet'}), 200
-        except Exception as e:
-            logger.error(f"Fehler bei manueller Newsletter-Generierung: {e}")
-            return jsonify({'error': str(e)}), 500
-
-    @app.route('/admin/subscribers')
-    def admin_subscribers():
-        """Liste aller Abonnenten"""
-        subscribers = Subscriber.query.order_by(Subscriber.created_at.desc()).all()
-        return jsonify([sub.to_dict() for sub in subscribers])
-
-    @app.route('/admin/documents')
-    def admin_documents():
-        """Liste aller überwachten Dokumente"""
-        documents = Document.query.order_by(Document
+                return jsonify
