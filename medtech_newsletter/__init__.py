@@ -122,4 +122,21 @@ def create_app(config_name='development'):
             email = data.get('email', '').strip().lower()
             
             if not email:
-                return jsonify
+                return jsonify({'error': 'E-Mail-Adresse ist erforderlich'}), 400
+            
+            subscriber = Subscriber.query.filter_by(email=email).first()
+            if not subscriber:
+                return jsonify({'error': 'E-Mail-Adresse nicht gefunden'}), 404
+            
+            if not subscriber.is_active:
+                return jsonify({'error': 'Sie sind bereits abgemeldet'}), 400
+            
+            subscriber.is_active = False
+            subscriber.updated_at = datetime.utcnow()
+            db.session.commit()
+            
+            email_service.send_unsubscribe_confirmation(email, subscriber.name)
+            
+            logger.info(f"Abonnent abgemeldet: {email}")
+            
+            return jsonify({'message': 'Erfolgreich abgemeldet!'}),
