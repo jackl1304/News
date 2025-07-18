@@ -6,11 +6,11 @@ from typing import Dict, List, Optional
 from loguru import logger
 import atexit
 
-from scraper import DocumentScraper
-from analyzer import DocumentAnalyzer
-from newsletter_generator import NewsletterGenerator
-from email_service import EmailService
-from models import db, Document, DocumentChange, Newsletter, Subscriber
+from medtech_newsletter.scraper import DocumentScraper
+from medtech_newsletter.analyzer import DocumentAnalyzer
+from medtech_newsletter.newsletter_generator import NewsletterGenerator
+from medtech_newsletter.email_service import EmailService
+from medtech_newsletter.models import db, Document, DocumentChange, Newsletter, Subscriber
 
 class TaskScheduler:
     """Scheduler für automatisierte Aufgaben des Newsletter-Systems"""
