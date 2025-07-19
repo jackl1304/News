@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Newsletter abmelden{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Konto deaktivieren</h3>
+                <p>Möchten Sie Ihr Konto wirklich deaktivieren und keine weiteren Newsletter erhalten?</p>
+                <form action="{{ url_for('main.unsubscribe') }}" method="post">
+                    <button type="submit" class="btn btn-danger">Ja, Konto deaktivieren</button>
+                    <a href="{{ url_for('main.user_dashboard') }}" class="btn btn-secondary">Abbrechen</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
