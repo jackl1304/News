@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Benutzer bearbeiten{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h2>Benutzer bearbeiten: {{ user.email }}</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label for="email" class="form-label">E-Mail-Adresse</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_admin" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+                <label class="form-check-label" for="is_admin">Ist Administrator</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Abbrechen</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
