@@ -21,49 +21,48 @@
 
 <div class="row mb-4">
     <div class="col-md-3">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Benutzer</h5>
-                <p class="card-text">{{ stats.total_subscribers }}</p>
+                <h5 class="card-title text-muted">Benutzer</h5>
+                <p class="card-text fs-4 fw-bold">{{ stats.total_subscribers }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Dokumente</h5>
-                <p class="card-text">{{ stats.total_documents }}</p>
+                <h5 class="card-title text-muted">Dokumente</h5>
+                <p class="card-text fs-4 fw-bold">{{ stats.total_documents }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Änderungen</h5>
-                <p class="card-text">{{ stats.pending_changes }}</p>
+                <h5 class="card-title text-muted">Änderungen</h5>
+                <p class="card-text fs-4 fw-bold">{{ stats.pending_changes }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">Newsletter</h5>
-                <p class="card-text">{{ stats.recent_newsletters|length }}</p>
+                <h5 class="card-title text-muted">Newsletter</h5>
+                <p class="card-text fs-4 fw-bold">{{ stats.recent_newsletters|length }}</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card mt-4">
+<div class="card mt-4 shadow-sm">
     <div class="card-header">
         Benutzerverwaltung
     </div>
     <div class="card-body">
-        <button class="btn btn-primary" onclick="loadUsers()">Benutzer laden</button>
+        <button class="btn btn-primary" onclick="loadUsers()">Benutzerliste laden</button>
         <div id="user-list" class="mt-3 table-responsive"></div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -97,15 +96,15 @@
     }
 
     async function loadUsers() {
+        const userListDiv = document.getElementById('user-list');
+        userListDiv.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
         const response = await fetch('/admin/users');
         const users = await response.json();
-        const userListDiv = document.getElementById('user-list');
         
         let tableHtml = `<table class="table table-striped table-sm"><thead><tr><th>ID</th><th>E-Mail</th><th>Admin</th><th>Aktionen</th></tr></thead><tbody>`;
         users.forEach(user => {
-            // Verhindern, dass der Löschen-Button für den Admin angezeigt wird, falls es nur einen Admin gibt
             let deleteButton = '';
-            if (!user.is_admin) {
+            if (!user.is_admin) { // Admins können nicht gelöscht werden
                  deleteButton = `<button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Löschen</button>`;
             }
 
