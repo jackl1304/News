@@ -6,9 +6,9 @@
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h2 class="card-title mb-4">Ihr Profil</h2>
-                <p class="text-muted">Hier können Sie Ihre Daten bearbeiten und vervollständigen.</p>
+                <p class="text-muted">Hier können Sie Ihre Daten bearbeiten.</p>
                 
-                <form action="{{ url_for('main.edit_profile') }}" method="post" class="row g-3">
+                <form action="{{ url_for('edit_profile') }}" method="post" class="row g-3">
                     <div class="col-md-6">
                         <label for="first_name" class="form-label">Vorname</label>
                         <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
@@ -17,60 +17,9 @@
                         <label for="last_name" class="form-label">Nachname</label>
                         <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
                     </div>
-
-                    <div class="col-md-6">
-                        <label for="company" class="form-label">Firma</label>
-                        <input type="text" class="form-control" id="company" name="company" value="{{ user.company or '' }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="position" class="form-label">Position</label>
-                        <input type="text" class="form-control" id="position" name="position" value="{{ user.position or '' }}">
-                    </div>
-
-                    <div class="col-12">
-                        <label for="phone_number" class="form-label">Telefonnummer</label>
-                        <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ user.phone_number or '' }}">
-                    </div>
-
-                    <div class="col-md-9">
-                        <label for="street" class="form-label">Straße</label>
-                        <input type="text" class="form-control" id="street" name="street" value="{{ user.street or '' }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="street_number" class="form-label">Nr.</label>
-                        <input type="text" class="form-control" id="street_number" name="street_number" value="{{ user.street_number or '' }}">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="postal_code" class="form-label">PLZ</label>
-                        <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ user.postal_code or '' }}">
-                    </div>
-                    <div class="col-md-8">
-                        <label for="city" class="form-label">Ort</label>
-                        <input type="text" class="form-control" id="city" name="city" value="{{ user.city or '' }}">
-                    </div>
-
-                    <div class="col-12">
-                        <label for="country" class="form-label">Land</label>
-                        <select id="country" name="country" class="form-select">
-                            <option value="">Bitte wählen...</option>
-                            {% for country in countries %}
-                            <option value="{{ country }}" {% if user.country == country %}selected{% endif %}>{{ country }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
                     <div class="col-12 mt-4">
                         <button type="submit" class="btn btn-primary">Profil speichern</button>
                     </div>
-                </form>
-
-                <hr class="my-4">
-
-                <h4 class="text-danger">Konto deaktivieren</h4>
-                <p class="text-muted">Achtung: Dieser Schritt deaktiviert Ihr Konto und Sie erhalten keine weiteren Newsletter.</p>
-                <form action="{{ url_for('main.unsubscribe') }}" method="post" onsubmit="return confirm('Möchten Sie Ihr Konto wirklich deaktivieren?');">
-                    <button type="submit" class="btn btn-danger">Konto jetzt deaktivieren</button>
                 </form>
             </div>
         </div>
