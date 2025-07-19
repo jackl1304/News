@@ -2,20 +2,17 @@
 {% block title %}Registrieren{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-4">
-        <h2 class="text-center">Registrieren</h2>
-        <form method="post" action="{{ url_for('main.register') }}">
-            <div class="mb-3">
-                <label for="email" class="form-label">E-Mail</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Neues Konto erstellen</h2>
+                <form action="{{ url_for('register') }}" method="post">
+                   <p class="text-center text-muted mb-0">
+                        Bereits ein Konto? <a href="{{ url_for('login') }}">Anmelden</a>
+                    </p>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Passwort</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Registrieren</button>
-        </form>
-        <p class="text-center mt-3">Bereits ein Konto? <a href="{{ url_for('main.login') }}">Anmelden</a></p>
+        </div>
     </div>
 </div>
 {% endblock %}
