@@ -25,12 +25,12 @@ class Config:
     SCRAPING_INTERVAL_HOURS = int(os.environ.get('SCRAPING_INTERVAL_HOURS') or 24)
     NEWSLETTER_GENERATION_INTERVAL_HOURS = int(os.environ.get('NEWSLETTER_GENERATION_INTERVAL_HOURS') or 168)  # Wöchentlich
     
-    # Quellen Konfiguration
+    # NEUE, FOKUSSIERTE QUELLEN-KONFIGURATION
     SOURCES = {
-        'DESTATIS': {
-            'base_url': 'https://www.destatis.de',
+        'G-BA': {
+            'base_url': 'https://www.g-ba.de',
             'search_paths': [
-                '/DE/Presse/_inhalt.html'
+                '/presse/pressemitteilungen/'
             ]
         },
         'BfArM': {
@@ -39,28 +39,22 @@ class Config:
                 '/DE/Medizinprodukte/_node.html'
             ]
         },
-        'EUROSTAT': {
-            'base_url': 'https://ec.europa.eu/eurostat',
+        'BVMed': {
+            'base_url': 'https://www.bvmed.de',
             'search_paths': [
-                '/web/main/news/whats-new'
+                '/de/bvmed/presse/pressemeldungen'
             ]
         },
-        'EZB': {
-            'base_url': 'https://www.ecb.europa.eu',
+        'MDCG': {
+            'base_url': 'https://health.ec.europa.eu',
             'search_paths': [
-                '/press/press_releases/html/index.de.html'
+                '/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en'
             ]
         },
-        'FDA': {
-            'base_url': 'https://www.fda.gov',
+        'MedTechEurope': {
+            'base_url': 'https://www.medtecheurope.org',
             'search_paths': [
-                '/medical-devices/news-events-medical-devices'
-            ]
-        },
-        'WELTBANK': {
-            'base_url': 'https://www.worldbank.org',
-            'search_paths': [
-                '/en/news/press-release'
+                '/news-and-events/press-releases/'
             ]
         }
     }
