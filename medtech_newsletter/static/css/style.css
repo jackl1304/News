@@ -1,90 +1,44 @@
-/* style.css - Modernes Design für die Newsletter App */
-
-/* Allgemeine Stile und Farbpalette */
-:root {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --light-gray: #f8f9fa;
-    --border-radius: 0.5rem;
+/* Generelle Anpassungen */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-body {
-    background-color: var(--light-gray);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* Wir entfernen den Standard-Abstand, da die Login-Seite den ganzen Bildschirm füllt */
+main.container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
 }
 
-main {
-    flex-grow: 1;
+/* Linke Spalte mit dem Hintergrundbild */
+.bg-image {
+    /* HIER WURDE IHR BILD EINGEFÜGT */
+    background-image: url('https://i.imgur.com/61e718.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 100%;
 }
 
-/* Navbar-Anpassungen */
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+/* Rechte Spalte mit dem Login-Formular */
+.login-form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
 }
 
-/* Karten-Styling für Formulare und Dashboard */
-.card {
-    border: none;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    transition: transform 0.2s ease-in-out;
+/* Bootstrap-Überschreibungen für ein modernes Aussehen */
+.form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+    line-height: 1.25;
 }
 
-.card:hover {
-    transform: translateY(-3px);
+.form-floating > label {
+    padding: 1rem 0.75rem;
 }
 
-.card-title {
-    font-weight: 600;
-    color: #212529;
-}
-
-/* Button-Styling */
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    font-weight: 600;
-    padding: 0.75rem 1rem;
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-/* Formular-Styling */
-.form-control {
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1rem;
-}
-
-.form-control:focus {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    border-color: var(--primary-color);
-}
-
-/* Footer-Styling */
-footer {
-    background-color: #e9ecef;
-    border-top: 1px solid #dee2e6;
-}
-
-/* Admin Dashboard Modal Anpassungen */
-.modal-header {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.modal-header .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
-}
-
-.table-responsive {
-    max-height: 60vh;
+.btn-lg {
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
 }
