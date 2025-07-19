@@ -2,37 +2,13 @@
 {% block title %}Registrieren{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-md-6 col-lg-4">
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h2 class="card-title text-center mb-4">Neues Konto erstellen</h2>
-                
-                <form action="{{ url_for('main.register') }}" method="post" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="first_name" class="form-label">Vorname</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="last_name" class="form-label">Nachname</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="company" class="form-label">Firma</label>
-                        <input type="text" class="form-control" id="company" name="company">
-                    </div>
-                    <div class="col-12">
-                        <label for="email" class="form-label">E-Mail-Adresse</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="col-12">
-                        <label for="password" class="form-label">Passwort</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="col-12 d-grid mt-3">
-                        <button type="submit" class="btn btn-primary">Konto erstellen</button>
-                    </div>
-                    <p class="text-center text-muted mt-3 mb-0">
-                        Bereits ein Konto? <a href="{{ url_for('main.login') }}">Jetzt anmelden</a>
+                <form action="{{ url_for('register') }}" method="post">
+                    <p class="text-center text-muted mb-0">
+                        Bereits ein Konto? <a href="{{ url_for('login') }}">Jetzt anmelden</a>
                     </p>
                 </form>
             </div>
