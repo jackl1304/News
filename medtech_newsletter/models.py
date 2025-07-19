@@ -1,6 +1,9 @@
-from .extensions import db
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+
+# Importiert die zentrale db-Instanz aus der neuen extensions.py Datei
+from .extensions import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +12,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     street = db.Column(db.String(200))
@@ -25,7 +29,17 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# ... (Die anderen Klassen Document, DocumentChange, Newsletter bleiben unverändert)
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'is_admin': self.is_admin,
+            'is_active': self.is_active,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'created_at': self.created_at.isoformat()
+        }
+
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     source = db.Column(db.String(50), nullable=False)
@@ -33,6 +47,15 @@ class Document(db.Model):
     title = db.Column(db.String(255), nullable=True)
     content_hash = db.Column(db.String(64), nullable=True)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'source': self.source,
+            'url': self.url,
+            'title': self.title,
+            'last_checked': self.last_checked.isoformat()
+        }
 
 class DocumentChange(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +66,16 @@ class DocumentChange(db.Model):
     detected_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     document = db.relationship('Document', backref=db.backref('changes', lazy=True))
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'document_id': self.document_id,
+            'change_summary': self.change_summary,
+            'importance_score': self.importance_score,
+            'processed': self.processed,
+            'detected_at': self.detected_at.isoformat()
+        }
+
 class Newsletter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
@@ -51,3 +84,12 @@ class Newsletter(db.Model):
     recipient_count = db.Column(db.Integer, default=0)
     generated_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     sent_at = db.Column(db.DateTime, nullable=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'recipient_count': self.recipient_count,
+            'generated_at': self.generated_at.isoformat(),
+            'sent_at': self.sent_at.isoformat() if self.sent_at else None
+        }
