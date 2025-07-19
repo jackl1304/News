@@ -2,12 +2,13 @@
 {% block title %}Registrieren{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
+    <div class="col-md-8 col-lg-6">
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h2 class="card-title text-center mb-4">Neues Konto erstellen</h2>
-                <form action="{{ url_for('register') }}" method="post">
-                    <p class="text-center text-muted mb-0">
+                
+                <form action="{{ url_for('register') }}" method="post" class="row g-3">
+                    <p class="text-center text-muted mt-3 mb-0">
                         Bereits ein Konto? <a href="{{ url_for('login') }}">Jetzt anmelden</a>
                     </p>
                 </form>
