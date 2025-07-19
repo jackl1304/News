@@ -9,113 +9,78 @@ class DocumentScraper:
         self.sources = sources
         self.session = requests.Session()
         
+        # Bessere Tarnung: Simuliert einen echten Browser-Request
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+        })
+        
         self.scraper_api_key = os.environ.get('SCRAPER_API_KEY')
         if not self.scraper_api_key:
-            logger.warning("SCRAPER_API_KEY nicht gefunden. Scraping könnte fehlschlagen.")
+            logger.warning("SCRAPER_API_KEY nicht gefunden. Scraping wird fehlschlagen.")
 
     def scrape_all_sources(self):
         logger.info("Starte Scraping aller Quellen über Proxy mit JS-Rendering...")
         all_documents = []
         for source_name, config in self.sources.items():
-            scraper_func = getattr(self, f"scrape_{source_name.lower()}", None)
-            if scraper_func:
-                docs = scraper_func(config)
-                all_documents.extend(docs)
+            docs = self.scrape_source(source_name, config)
+            all_documents.extend(docs)
         logger.info(f"Scraping abgeschlossen. {len(all_documents)} Dokumente gefunden.")
         return all_documents
 
+    def scrape_source(self, name, config):
+        logger.info(f"Starte Scraping für: {name}...")
+        base_url = config['base_url']
+        all_docs = []
+        for path in config['search_paths']:
+            all_docs.extend(self._scrape_generic_page(base_url, path))
+        logger.info(f"{name} Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
+        return all_docs
+
     def _scrape_generic_page(self, base_url, path):
-        """Eine generische Funktion zum Scrapen einer Seite und Finden von Links."""
         target_url = urljoin(base_url, path)
         
         if not self.scraper_api_key:
             logger.error("Scraping ohne API Key nicht möglich.")
             return []
 
-        # HIER IST DIE ÄNDERUNG: Wir fügen &render=true hinzu, um JavaScript zu aktivieren
+        # Wir nutzen den Proxy-Dienst mit aktiviertem JavaScript-Rendering
         proxy_url = f"http://api.scraperapi.com/?api_key={self.scraper_api_key}&url={target_url}&render=true"
-
         documents = []
+        
         try:
             logger.info(f"Scraping URL: {target_url} via Proxy")
-            response = self.session.get(proxy_url, timeout=180) # Längeres Timeout für JS-Rendering
-            response.raise_for_status()
+            response = self.session.get(proxy_url, timeout=180)
+            
+            # **NEU: Intelligente Fehleranalyse**
+            if response.status_code != 200:
+                logger.error(f"Fehler von ScraperAPI für {target_url}. Status: {response.status_code}")
+                # Wir loggen den Anfang der Antwort, um zu sehen, was schiefgeht
+                logger.error(f"Antwort-Anfang: {response.text[:1000]}") 
+                response.raise_for_status()
             
             soup = BeautifulSoup(response.content, 'html.parser')
-            
             links = soup.find_all('a', href=True)
             
+            if not links:
+                logger.warning(f"Keine Links auf der Seite gefunden: {target_url}")
+                # Wir loggen auch hier die Antwort, um zu sehen, warum keine Links da sind
+                logger.warning(f"Seiteninhalt-Anfang: {response.text[:1000]}")
+
             for link in links:
                 href = link['href']
-                if href.startswith('#') or href.startswith('mailto:') or href.startswith('javascript:'):
+                # Verfeinerter Filter für Links
+                if href.startswith(('#', 'mailto:', 'javascript:')) or not link.get_text(strip=True):
                     continue
 
                 doc_url = urljoin(target_url, href)
                 doc_title = link.get_text(strip=True)
                 
-                if doc_title:
-                    documents.append({
-                        'source': base_url,
-                        'url': doc_url,
-                        'title': doc_title
-                    })
+                documents.append({'source': base_url, 'url': doc_url, 'title': doc_title})
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"Fehler beim Scraping von {target_url}: {e}")
+            logger.error(f"Netzwerkfehler beim Scraping von {target_url}: {e}")
         
         return documents
-
-    # Die folgenden Funktionen bleiben gleich
-    def scrape_destatis(self, config):
-        logger.info("Starte Destatis Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"Destatis Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
-    
-    def scrape_bfarm(self, config):
-        logger.info("Starte BfArM Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"BfArM Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
-
-    def scrape_eurostat(self, config):
-        logger.info("Starte Eurostat Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"Eurostat Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
-        
-    def scrape_ezb(self, config):
-        logger.info("Starte EZB Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"EZB Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
-
-    def scrape_fda(self, config):
-        logger.info("Starte FDA Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"FDA Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
-
-    def scrape_weltbank(self, config):
-        logger.info("Starte Weltbank Scraping...")
-        base_url = config['base_url']
-        all_docs = []
-        for path in config['search_paths']:
-            all_docs.extend(self._scrape_generic_page(base_url, path))
-        logger.info(f"Weltbank Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
-        return all_docs
