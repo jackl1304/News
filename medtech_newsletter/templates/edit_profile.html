@@ -6,16 +6,7 @@
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h2 class="card-title mb-4">Ihr Profil</h2>
-                
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                <p class="text-muted">Bitte vervollständigen Sie Ihre Daten.</p>
+                <p class="text-muted">Hier können Sie Ihre Daten bearbeiten und vervollständigen.</p>
                 
                 <form action="{{ url_for('main.edit_profile') }}" method="post" class="row g-3">
                     <div class="col-md-6">
@@ -25,6 +16,20 @@
                     <div class="col-md-6">
                         <label for="last_name" class="form-label">Nachname</label>
                         <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="company" class="form-label">Firma</label>
+                        <input type="text" class="form-control" id="company" name="company" value="{{ user.company or '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="text" class="form-control" id="position" name="position" value="{{ user.position or '' }}">
+                    </div>
+
+                    <div class="col-12">
+                        <label for="phone_number" class="form-label">Telefonnummer</label>
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ user.phone_number or '' }}">
                     </div>
 
                     <div class="col-md-9">
@@ -55,15 +60,6 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="company" class="form-label">Firma</label>
-                        <input type="text" class="form-control" id="company" name="company" value="{{ user.company or '' }}">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="position" class="form-label">Position</label>
-                        <input type="text" class="form-control" id="position" name="position" value="{{ user.position or '' }}">
-                    </div>
-
                     <div class="col-12 mt-4">
                         <button type="submit" class="btn btn-primary">Profil speichern</button>
                     </div>
@@ -72,7 +68,7 @@
                 <hr class="my-4">
 
                 <h4 class="text-danger">Konto deaktivieren</h4>
-                <p class="text-muted">Achtung: Dieser Schritt deaktiviert Ihr Konto. Sie erhalten eine E-Mail zur endgültigen Löschung.</p>
+                <p class="text-muted">Achtung: Dieser Schritt deaktiviert Ihr Konto und Sie erhalten keine weiteren Newsletter.</p>
                 <form action="{{ url_for('main.unsubscribe') }}" method="post" onsubmit="return confirm('Möchten Sie Ihr Konto wirklich deaktivieren?');">
                     <button type="submit" class="btn btn-danger">Konto jetzt deaktivieren</button>
                 </form>
