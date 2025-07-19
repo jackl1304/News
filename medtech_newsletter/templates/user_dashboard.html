@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Willkommen, {{ session.user_email }}!</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Neueste Dokumente</h4>
+            <ul class="list-group">
+                {% for doc in documents %}
+                    <li class="list-group-item">
+                        <a href="{{ doc.url }}" target="_blank">{{ doc.title }}</a>
+                        <small class="d-block text-muted">Geprüft am: {{ doc.last_checked.strftime('%d.%m.%Y') }}</small>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Noch keine Dokumente gefunden.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Neueste Änderungen</h4>
+            <ul class="list-group">
+                {% for change in changes %}
+                    <li class="list-group-item">
+                        {{ change.change_summary }}
+                        <small class="d-block text-muted">Entdeckt am: {{ change.detected_at.strftime('%d.%m.%Y') }}</small>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">Noch keine Änderungen erfasst.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
