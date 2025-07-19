@@ -1,8 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
+from .extensions import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-
-db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +25,7 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+# ... (Die anderen Klassen Document, DocumentChange, Newsletter bleiben unverändert)
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     source = db.Column(db.String(50), nullable=False)
