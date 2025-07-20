@@ -1,9 +1,10 @@
-from jinja2 import Template
+"""Modul zur Generierung von personalisierten Newslettern."""
 from datetime import datetime
 from typing import Dict, List, Optional
+
 from loguru import logger
-import json
-import re
+from jinja2 import Template
+
 
 class NewsletterGenerator:
     """Klasse für die Generierung von personalisierten Newslettern"""
@@ -23,7 +24,7 @@ class NewsletterGenerator:
     <title>{{ newsletter_title }}</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 800px;
@@ -229,7 +230,10 @@ class NewsletterGenerator:
             {% if changes|length > 0 %}
                 <div class="summary">
                     <h3>Zusammenfassung</h3>
-                    <p>In diesem Newsletter informieren wir Sie über {{ changes|length }} wichtige Änderung{% if changes|length != 1 %}en{% endif %} in den Medizintechnik- und Healthcare-Regulierungen. Die Informationen stammen aus vertrauenswürdigen Quellen wie FDA, BfArM, ISO und TÜV.</p>
+                    <p>In diesem Newsletter informieren wir Sie über {{ changes|length }} wichtige 
+                    Änderung{% if changes|length != 1 %}en{% endif %} in den Medizintechnik- und 
+                    Healthcare-Regulierungen. Die Informationen stammen aus vertrauenswürdigen 
+                    Quellen wie FDA, BfArM, ISO und TÜV.</p>
                 </div>
                 
                 {% for change in changes %}
@@ -242,7 +246,8 @@ class NewsletterGenerator:
                         <p class="change-meta">
                             <span class="source-badge">{{ change.source }}</span>
                             {% if change.importance_level %}
-                                <span class="importance-badge importance-{{ change.importance_level }}">
+                                <span class="importance-badge 
+                                importance-{{ change.importance_level }}">
                                     {{ change.importance_level|title }} Priorität
                                 </span>
                             {% endif %}
@@ -297,7 +302,8 @@ class NewsletterGenerator:
                         
                         {% if change.url %}
                         <p style="margin-top: 20px;">
-                            <a href="{{ change.url }}" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                            <a href="{{ change.url }}" style="color: #667eea; 
+                            text-decoration: none; font-weight: 500;">
                                 → Vollständiges Dokument anzeigen
                             </a>
                         </p>
@@ -309,7 +315,8 @@ class NewsletterGenerator:
                 <div class="no-changes">
                     <div class="icon-placeholder"></div>
                     <h3>Keine neuen Änderungen</h3>
-                    <p>In diesem Zeitraum wurden keine signifikanten Änderungen in den überwachten Regulierungen und Standards erkannt.</p>
+                    <p>In diesem Zeitraum wurden keine signifikanten Änderungen in den überwachten 
+                    Regulierungen und Standards erkannt.</p>
                 </div>
             {% endif %}
         </div>
@@ -323,8 +330,9 @@ class NewsletterGenerator:
                 <a href="#">Archiv anzeigen</a>
             </p>
             <p style="font-size: 12px; margin-top: 15px;">
-                Dieser Newsletter wird automatisch generiert und überwacht Änderungen in Medizintechnik-Regulierungen.
-                Die Informationen dienen nur zur Information und ersetzen keine rechtliche Beratung.
+                Dieser Newsletter wird automatisch generiert und überwacht Änderungen in 
+                Medizintechnik-Regulierungen. Die Informationen dienen nur zur Information 
+                und ersetzen keine rechtliche Beratung.
             </p>
         </div>
     </div>
@@ -345,7 +353,10 @@ Hallo{% if subscriber_name %} {{ subscriber_name }}{% endif %},
 {% if changes|length > 0 %}
 ZUSAMMENFASSUNG
 {{ "-" * 15 }}
-In diesem Newsletter informieren wir Sie über {{ changes|length }} wichtige Änderung{% if changes|length != 1 %}en{% endif %} in den Medizintechnik- und Healthcare-Regulierungen. Die Informationen stammen aus vertrauenswürdigen Quellen wie FDA, BfArM, ISO und TÜV.
+In diesem Newsletter informieren wir Sie über {{ changes|length }} wichtige 
+Änderung{% if changes|length != 1 %}en{% endif %} in den Medizintechnik- und 
+Healthcare-Regulierungen. Die Informationen stammen aus vertrauenswürdigen 
+Quellen wie FDA, BfArM, ISO und TÜV.
 
 {% for change in changes %}
 {{ loop.index }}. {{ change.title }}
@@ -389,7 +400,8 @@ Vollständiges Dokument: {{ change.url }}
 {% else %}
 KEINE NEUEN ÄNDERUNGEN
 {{ "-" * 25 }}
-In diesem Zeitraum wurden keine signifikanten Änderungen in den überwachten Regulierungen und Standards erkannt.
+In diesem Zeitraum wurden keine signifikanten Änderungen in den überwachten 
+Regulierungen und Standards erkannt.
 {% endif %}
 
 {{ "=" * 60 }}
@@ -400,8 +412,9 @@ Newsletter abbestellen: [Link]
 Einstellungen ändern: [Link]
 Archiv anzeigen: [Link]
 
-Dieser Newsletter wird automatisch generiert und überwacht Änderungen in Medizintechnik-Regulierungen.
-Die Informationen dienen nur zur Information und ersetzen keine rechtliche Beratung.
+Dieser Newsletter wird automatisch generiert und überwacht Änderungen in 
+Medizintechnik-Regulierungen. Die Informationen dienen nur zur Information 
+und ersetzen keine rechtliche Beratung.
         """
         return Template(text_content)
     
@@ -409,14 +422,15 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
         """Generiert einen personalisierten Newsletter"""
         
         # Sortiere Änderungen nach Wichtigkeit
-        sorted_changes = sorted(changes, key=lambda x: x.get('importance_score', 0), reverse=True)
+        sorted_changes = sorted(changes, key=lambda x: x.get(
+            \'importance_score\', 0), reverse=True)
         
         # Bereite Daten für Template vor
         template_data = {
-            'newsletter_title': self._generate_title(sorted_changes),
-            'subscriber_name': subscriber.get('name') if subscriber else None,
-            'changes': self._prepare_changes_for_template(sorted_changes, subscriber),
-            'generation_date': datetime.now().strftime('%d.%m.%Y um %H:%M Uhr')
+            \'newsletter_title\': self._generate_title(sorted_changes),
+            \'subscriber_name\': subscriber.get(\'name\') if subscriber else None,
+            \'changes\': self._prepare_changes_for_template(sorted_changes, subscriber),
+            \'generation_date\': datetime.now().strftime(\'%d.%m.%Y um %H:%M Uhr\')
         }
         
         # Generiere HTML und Text Versionen
@@ -424,60 +438,62 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
         text_content = self.text_template.render(**template_data)
         
         return {
-            'title': template_data['newsletter_title'],
-            'html_content': html_content,
-            'text_content': text_content,
-            'changes_count': len(sorted_changes),
-            'subscriber_id': subscriber.get('id') if subscriber else None
+            \'title\': template_data[\'newsletter_title\'],
+            \'html_content\': html_content,
+            \'text_content\': text_content,
+            \'changes_count\': len(sorted_changes),
+            \'subscriber_id\': subscriber.get(\'id\') if subscriber else None
         }
     
     def _generate_title(self, changes: List[Dict]) -> str:
         """Generiert einen aussagekräftigen Titel für den Newsletter"""
         if not changes:
-            return f"Medizintechnik Newsletter - {datetime.now().strftime('%B %Y')}"
+            return f"Medizintechnik Newsletter - {datetime.now().strftime(\'%B %Y\')}"
         
         change_count = len(changes)
-        current_date = datetime.now().strftime('%B %Y')
+        current_date = datetime.now().strftime(\'%B %Y\')
         
         if change_count == 1:
             return f"Wichtige Regulierungsänderung - {current_date}"
-        elif change_count <= 3:
+        
+        if change_count <= 3:
             return f"{change_count} neue Regulierungsänderungen - {current_date}"
-        else:
-            return f"Umfassende Regulierungsupdate - {current_date}"
+        
+        return f"Umfassende Regulierungsupdate - {current_date}"
     
-    def _prepare_changes_for_template(self, changes: List[Dict], subscriber: Optional[Dict] = None) -> List[Dict]:
+    def _prepare_changes_for_template(self, changes: List[Dict], 
+                                       subscriber: Optional[Dict] = None) -> List[Dict]:
         """Bereitet Änderungen für das Template vor und personalisiert sie"""
         prepared_changes = []
         
         for change in changes:
             # Bestimme Wichtigkeitslevel
-            importance_score = change.get('importance_score', 0)
+            importance_score = change.get(\'importance_score\', 0)
             if importance_score >= 70:
-                importance_level = 'high'
+                importance_level = \'high\'
             elif importance_score >= 40:
-                importance_level = 'medium'
+                importance_level = \'medium\'
             else:
-                importance_level = 'low'
+                importance_level = \'low\'
             
             # Personalisierung basierend auf Abonnenten-Interessen
-            if subscriber and subscriber.get('interests'):
-                relevance_score = self._calculate_relevance(change, subscriber['interests'])
-                if relevance_score < 0.3:  # Niedrige Relevanz, überspringe oder kürze
+            if subscriber and subscriber.get(\'interests\'):
+                relevance = self._calculate_relevance(change, subscriber[\'interests\'])
+                if relevance < 0.3:  # Mindest-Relevanz-Schwelle
                     continue
             
             prepared_change = {
-                'title': change.get('title', 'Unbekannte Änderung'),
-                'source': change.get('source', 'Unbekannt'),
-                'summary': self._create_change_summary(change),
-                'importance_level': importance_level,
-                'importance_score': importance_score,
-                'detected_at': self._format_date(change.get('detected_at')),
-                'url': change.get('url'),
-                'key_topics': change.get('key_topics', []),
-                'regulations': change.get('regulations', []),
-                'standards': change.get('standards', []),
-                'dates': change.get('dates', [])
+                \'title\': change.get(\'title\', \'Unbekannte Änderung\'),
+                \'source\': change.get(\'source\', \'Unbekannt\'),
+                \'summary\': self._create_change_summary(change),
+                \'importance_level\': importance_level,
+                \'importance_score\': importance_score,
+                \'detected_at\': self._format_date(change.get(\'detected_at\')),
+                \'url\': change.get(\'url\'),
+                \'key_topics\': change.get(\'key_topics\', []),
+                \'regulations\': change.get(\'regulations\', []),
+                \'standards\': change.get(\'standards\', []),
+                \'dates\': change.get(\'dates\', [])
             }
             
             prepared_changes.append(prepared_change)
@@ -486,30 +502,30 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
     
     def _create_change_summary(self, change: Dict) -> str:
         """Erstellt eine aussagekräftige Zusammenfassung der Änderung"""
-        summary = change.get('change_summary', '')
+        summary = change.get(\'change_summary\', \'\')
         
         if not summary:
             # Fallback: Erstelle Zusammenfassung aus verfügbaren Daten
-            change_type = change.get('change_type', 'update')
-            source = change.get('source', 'einer Quelle')
+            change_type = change.get(\'change_type\', \'update\')
+            source = change.get(\'source\', \'einer Quelle\')
             
-            if change_type == 'new':
+            if change_type == \'new\':
                 summary = f"Ein neues Dokument wurde von {source} veröffentlicht."
-            elif change_type == 'major_update':
+            elif change_type == \'major_update\':
                 summary = f"Ein wichtiges Dokument von {source} wurde erheblich überarbeitet."
-            elif change_type == 'moderate_update':
+            elif change_type == \'moderate_update\':
                 summary = f"Ein Dokument von {source} wurde aktualisiert."
             else:
                 summary = f"Änderungen in einem Dokument von {source} wurden erkannt."
         
         # Erweitere Zusammenfassung mit wichtigen Details
-        if change.get('key_topics'):
-            topics = ', '.join(change['key_topics'][:3])  # Erste 3 Themen
+        if change.get(\'key_topics\'):
+            topics = \', \'.join(change[\'key_topics\'][:3])  # Erste 3 Themen
             summary += f" Betroffene Bereiche: {topics}."
         
-        if change.get('change_indicators'):
-            indicators = change['change_indicators'][:2]  # Erste 2 Indikatoren
-            summary += f" Wichtige Änderungen: {', '.join(indicators)}."
+        if change.get(\'change_indicators\'):
+            indicators = change[\'change_indicators\'][:2]  # Erste 2 Indikatoren
+            summary += f" Wichtige Änderungen: {\', \'.join(indicators)}."
         
         return summary
     
@@ -522,7 +538,7 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
         total_weight = 0
         
         # Prüfe Übereinstimmung mit Themen
-        change_topics = [topic.lower() for topic in change.get('key_topics', [])]
+        change_topics = [topic.lower() for topic in change.get(\'key_topics\', [])]
         for interest in interests:
             interest_lower = interest.lower()
             weight = 1.0
@@ -539,7 +555,7 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
             total_weight += weight
         
         # Prüfe Übereinstimmung mit Regulierungen und Standards
-        regulations_standards = change.get('regulations', []) + change.get('standards', [])
+        regulations_standards = change.get(\'regulations\', []) + change.get(\'standards\', [])
         for item in regulations_standards:
             for interest in interests:
                 if interest.lower() in item.lower():
@@ -548,38 +564,40 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
         
         return min(relevance_score / max(total_weight, 1), 1.0) if total_weight > 0 else 0.5
     
-    def _format_date(self, date_str: Optional[str]) -> Optional[str]:
+    def _format_date(self, date_input: Optional[str]) -> Optional[str]:
         """Formatiert ein Datum für die Anzeige"""
-        if not date_str:
+        if date_input is None:
             return None
         
-        try:
-            if isinstance(date_str, str):
-                # Versuche verschiedene Datumsformate zu parsen
-                for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%d.%m.%Y', '%d/%m/%Y']:
-                    try:
-                        dt = datetime.strptime(date_str, fmt)
-                        return dt.strftime('%d.%m.%Y')
-                    except ValueError:
-                        continue
-            return date_str
-        except Exception:
-            return date_str
+        if isinstance(date_input, datetime):
+            return date_input.strftime(\'%d.%m.%Y\')
+        
+        if isinstance(date_input, str):
+            # Versuche verschiedene Datumsformate zu parsen
+            for fmt in [\' %Y-%m-%d %H:%M:%S\', \'%Y-%m-%d\', \'%d.%m.%Y\', \'%d/%m/%Y\']:
+                try:
+                    dt = datetime.strptime(date_input, fmt)
+                    return dt.strftime(\'%d.%m.%Y\')
+                except ValueError:
+                    continue
+        
+        return str(date_input) # Fallback für unbekannte Typen oder Formate
     
-    def generate_personalized_newsletters(self, changes: List[Dict], subscribers: List[Dict]) -> List[Dict]:
+    def generate_personalized_newsletters(self, changes: List[Dict], 
+                                          subscribers: List[Dict]) -> List[Dict]:
         """Generiert personalisierte Newsletter für alle Abonnenten"""
         newsletters = []
         
         for subscriber in subscribers:
-            if not subscriber.get('is_active', True):
+            if not subscriber.get(\'is_active\', True):
                 continue
             
             # Filtere Änderungen basierend auf Abonnenten-Interessen
             relevant_changes = []
             for change in changes:
-                if subscriber.get('interests'):
-                    relevance = self._calculate_relevance(change, subscriber['interests'])
-                    if relevance >= 0.3:  # Mindest-Relevanz-Schwelle
+                if subscriber.get(\'interests\'):
+                    relevance = self._calculate_relevance(change, subscriber[\'interests\'])
+                    if relevance < 0.3:  # Mindest-Relevanz-Schwelle
                         relevant_changes.append(change)
                 else:
                     relevant_changes.append(change)  # Alle Änderungen wenn keine Interessen definiert
@@ -587,9 +605,9 @@ Die Informationen dienen nur zur Information und ersetzen keine rechtliche Berat
             # Generiere Newsletter nur wenn relevante Änderungen vorhanden
             if relevant_changes or not changes:  # Sende auch leere Newsletter
                 newsletter = self.generate_newsletter(relevant_changes, subscriber)
-                newsletter['subscriber'] = subscriber
+                newsletter[\'subscriber\'] = subscriber
                 newsletters.append(newsletter)
         
-        logger.info(f"Generierte {len(newsletters)} personalisierte Newsletter für {len(subscribers)} Abonnenten")
+        logger.info(f"Generierte {len(newsletters)} personalisierte Newsletter für "
+                    f"{len(subscribers)} Abonnenten")
         return newsletters
-
