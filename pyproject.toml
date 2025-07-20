@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "news-aggregator"
+version = "0.1.0"
+description = "Universeller News-Aggregator für RSS, APIs und Scraping"
+authors = ["Dein Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.8"
+feedparser = "^6.0"
+jinja2 = "^3.1"
+aiosqlite = "^0.17"
+python-dotenv = "^0.21"
+fastapi = "^0.95"
+uvicorn = {extras = ["standard"], version = "^0.22"}
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+flake8 = "^6.0"
+black = "^23.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
