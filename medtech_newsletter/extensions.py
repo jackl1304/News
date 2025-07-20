@@ -1,4 +1,4 @@
-# medtech_newsletter/extensions.py
+"""Zentrale Erweiterungen für die Flask-Anwendung."""
 
 from flask_sqlalchemy import SQLAlchemy
 
