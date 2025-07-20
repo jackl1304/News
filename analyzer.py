@@ -1,24 +1,23 @@
+"""Modul zur Analyse und Verarbeitung von Dokumenten."""
+import difflib
+from typing import Dict, List
+import re
+
 import spacy
 import nltk
-from textdistance import levenshtein, jaccard
-import difflib
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
 from loguru import logger
-import re
-import json
-from collections import Counter
+from textdistance import jaccard
 
 # NLTK Downloads (falls noch nicht vorhanden)
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find("tokenizers/punkt")
 except LookupError:
-    nltk.download('punkt')
+    nltk.download("punkt")
 
 try:
-    nltk.data.find('corpora/stopwords')
+    nltk.data.find("corpora/stopwords")
 except LookupError:
-    nltk.download('stopwords')
+    nltk.download("stopwords")
 
 class DocumentAnalyzer:
     """Klasse für die Analyse und Verarbeitung von Dokumenten"""
@@ -63,7 +62,7 @@ class DocumentAnalyzer:
                 logger.warning("Kein spaCy-Modell gefunden. Verwende einfache Textverarbeitung.")
                 self.nlp = None
     
-    def extract_key_information(self, content: str, metadata: Dict) -> Dict:
+    def extract_key_information(self, content: str) -> Dict:
         """Extrahiert Schlüsselinformationen aus dem Dokumentinhalt"""
         info = {
             'summary': '',
@@ -108,10 +107,10 @@ class DocumentAnalyzer:
         if self.nlp:
             doc = self.nlp(text)
             return [sent.text.strip() for sent in doc.sents if len(sent.text.strip()) > 10]
-        else:
-            # Fallback: einfache Satzaufteilung
-            sentences = re.split(r'[.!?]+', text)
-            return [s.strip() for s in sentences if len(s.strip()) > 10]
+        
+        # Fallback: einfache Satzaufteilung
+        sentences = re.split(r'[.!?]+', text)
+        return [s.strip() for s in sentences if len(s.strip()) > 10]
     
     def _identify_important_sentences(self, sentences: List[str]) -> List[str]:
         """Identifiziert wichtige Sätze basierend auf Keywords"""
@@ -122,7 +121,7 @@ class DocumentAnalyzer:
             sentence_lower = sentence.lower()
             
             # Score basierend auf medizinischen Keywords
-            for category, keywords in self.medical_keywords.items():
+            for _, keywords in self.medical_keywords.items(): # 'category' ist ungenutzt
                 for keyword in keywords:
                     if keyword in sentence_lower:
                         score += 1
@@ -225,13 +224,13 @@ class DocumentAnalyzer:
         content_lower = content.lower()
         
         # Basis-Score basierend auf Schlüsselwörtern
-        for category, keywords in self.medical_keywords.items():
+        for _, keywords in self.medical_keywords.items(): # 'category' ist ungenutzt
             for keyword in keywords:
                 score += content_lower.count(keyword)
         
         # Zusätzliche Punkte für spezifische Indikatoren
         high_importance_words = ['mandatory', 'required', 'deadline', 'compliance', 
-                                'pflicht', 'erforderlich', 'frist', 'konformität']
+                               'pflicht', 'erforderlich', 'frist', 'konformität']
         for word in high_importance_words:
             score += content_lower.count(word) * 2
         
@@ -264,11 +263,19 @@ class DocumentAnalyzer:
     
     def compare_documents(self, old_content: str, new_content: str) -> Dict:
         """Vergleicht zwei Dokumentversionen und identifiziert Änderungen"""
-        if not old_content or not new_content:
+        if not old_content:
             return {
                 'similarity_score': 0.0,
-                'change_type': 'new' if not old_content else 'deleted',
-                'diff_summary': 'Neues Dokument' if not old_content else 'Dokument gelöscht',
+                'change_type': 'new',
+                'diff_summary': 'Neues Dokument',
+                'detailed_changes': [],
+                'importance_score': 0
+            }
+        if not new_content:
+            return {
+                'similarity_score': 0.0,
+                'change_type': 'deleted',
+                'diff_summary': 'Dokument gelöscht',
                 'detailed_changes': [],
                 'importance_score': 0
             }
@@ -305,19 +312,17 @@ class DocumentAnalyzer:
         seq_matcher = difflib.SequenceMatcher(None, text1, text2)
         seq_sim = seq_matcher.ratio()
         
-        # Durchschnitt der Metriken
         return (jaccard_sim + seq_sim) / 2
     
     def _determine_change_type(self, similarity_score: float) -> str:
         """Bestimmt den Typ der Änderung basierend auf dem Ähnlichkeitsscore"""
         if similarity_score > 0.9:
             return 'minor_update'
-        elif similarity_score > 0.7:
+        if similarity_score > 0.7:
             return 'moderate_update'
-        elif similarity_score > 0.3:
+        if similarity_score > 0.3:
             return 'major_update'
-        else:
-            return 'complete_rewrite'
+        return 'complete_rewrite'
     
     def _find_detailed_changes(self, old_content: str, new_content: str) -> List[Dict]:
         """Findet detaillierte Änderungen zwischen zwei Texten"""
@@ -330,10 +335,15 @@ class DocumentAnalyzer:
         differ = difflib.unified_diff(old_lines, new_lines, lineterm='')
         diff_lines = list(differ)
         
-        current_change = None
+        current_change = {
+            'type': 'section_change',
+            'location': '',
+            'removed_lines': [],
+            'added_lines': []
+        }
         for line in diff_lines:
             if line.startswith('@@'):
-                if current_change:
+                if current_change['removed_lines'] or current_change['added_lines']:
                     changes.append(current_change)
                 current_change = {
                     'type': 'section_change',
@@ -341,12 +351,12 @@ class DocumentAnalyzer:
                     'removed_lines': [],
                     'added_lines': []
                 }
-            elif line.startswith('-') and current_change:
+            elif line.startswith('-'):
                 current_change['removed_lines'].append(line[1:])
-            elif line.startswith('+') and current_change:
+            elif line.startswith('+'):
                 current_change['added_lines'].append(line[1:])
         
-        if current_change:
+        if current_change['removed_lines'] or current_change['added_lines']:
             changes.append(current_change)
         
         return changes
