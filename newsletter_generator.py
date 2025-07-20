@@ -5,7 +5,6 @@ class NewsletterGenerator:
     """Erstellt den HTML- und Text-Inhalt für einen Newsletter."""
 
     def __init__(self):
-        # Der DocumentAnalyzer wird bei Bedarf innerhalb der Methoden erstellt.
         pass
 
     def generate_html(self, changes: list) -> dict:
@@ -18,9 +17,11 @@ class NewsletterGenerator:
         # Sortiere Änderungen nach Wichtigkeit (höchste zuerst)
         try:
             sorted_changes = sorted(changes, key=lambda c: c.importance_score, reverse=True)
+        except AttributeError:
+            # Fallback, falls das change-Objekt den Score nicht direkt hat
+            sorted_changes = sorted(changes, key=lambda c: c.get('importance_score', 0), reverse=True)
         except Exception as e:
             logger.error(f"Fehler beim Sortieren der Änderungen: {e}")
-            # Fallback, falls 'importance_score' fehlt
             sorted_changes = changes
 
         # Baue den HTML-Inhalt auf
@@ -31,7 +32,12 @@ class NewsletterGenerator:
         text_body += "Hier sind die neuesten erkannten Änderungen und relevanten Dokumente:\n\n"
 
         for change in sorted_changes:
-            doc = change.document
+            # Zugriff auf das verknüpfte Dokument
+            doc = change.document 
+            if not doc:
+                logger.warning(f"Änderung {change.id} hat kein verknüpftes Dokument.")
+                continue
+
             html_body += f"""
                 <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
                     <h3><a href="{doc.url}">{doc.title or 'Unbekannter Titel'}</a></h3>
