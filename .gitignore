@@ -1,1 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Environments
 .env
+
+# Datenbank
+data/
+
+# Editor
+.vscode/
