@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>News-Update</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 4px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .article {
+      border-bottom: 1px solid #dddddd;
+      padding: 12px 0;
+    }
+    .article:last-child {
+      border-bottom: none;
+    }
+    .title {
+      font-size: 18px;
+      margin: 0;
+    }
+    .title a {
+      color: #1a0dab;
+      text-decoration: none;
+    }
+    .meta {
+      font-size: 12px;
+      color: #888888;
+      margin-top: 4px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #888888;
+      text-align: center;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>News-Update vom {{ date }}</h1>
+    {% for article in articles %}
+    <div class="article">
+      <p class="title">
+        <a href="{{ article.link }}">{{ article.title }}</a>
+      </p>
+      <p class="meta">
+        Veröffentlicht: {{ article.published }} | Quelle: {{ article.source }}
+      </p>
+    </div>
+    {% endfor %}
+    <p class="footer">
+      Wenn du keine Mails mehr erhalten möchtest, antworte bitte mit „Abmelden“.
+    </p>
+  </div>
+</body>
+</html>
