@@ -14,19 +14,21 @@ USER_AGENTS = [
 ]
 
 class DocumentScraper:
+    """Klasse zum Scrapen von Dokumenten aus verschiedenen Quellen."""
     def __init__(self, sources):
         self.sources = sources
         self.session = requests.Session()
-        self.scraper_api_key = os.environ.get('SCRAPER_API_KEY')
+        self.scraper_api_key = os.environ.get(\'SCRAPER_API_KEY\')
         if not self.scraper_api_key:
             logger.warning("SCRAPER_API_KEY nicht gefunden. Scraping wird fehlschlagen.")
 
     def scrape_all_sources(self):
+        """Scrapt Dokumente von allen konfigurierten Quellen."""
         logger.info("Starte gezieltes Scraping zur Fehleranalyse...")
         all_documents = []
         
         # WIR TESTEN JETZT NUR EINE QUELLE
-        source_to_test = 'G-BA'
+        source_to_test = \'G-BA\'
         
         logger.info(f"Fokussiere auf Test-Quelle: {source_to_test}")
         config = self.sources.get(source_to_test)
@@ -35,22 +37,24 @@ class DocumentScraper:
             docs = self.scrape_source(source_to_test, config)
             all_documents.extend(docs)
         else:
-            logger.error(f"Test-Quelle '{source_to_test}' nicht in der Konfiguration gefunden.")
+            logger.error(f"Test-Quelle \'{source_to_test}\' nicht in der Konfiguration gefunden.")
             
         logger.info(f"Scraping abgeschlossen. {len(all_documents)} Dokumente von {source_to_test} gefunden.")
         return all_documents
 
     def scrape_source(self, name, config):
+        """Scrapt Dokumente von einer spezifischen Quelle."""
         logger.info(f"Starte Scraping für: {name}...")
-        base_url = config['base_url']
+        base_url = config[\'base_url\']
         all_docs = []
-        for path in config['search_paths']:
+        for path in config[\'search_paths\']:
             all_docs.extend(self._scrape_generic_page(base_url, path))
             time.sleep(random.uniform(2, 5))
         logger.info(f"{name} Scraping abgeschlossen. {len(all_docs)} Dokumente gefunden.")
         return all_docs
 
     def _scrape_generic_page(self, base_url, path):
+        """Scrapt eine generische Seite nach Links zu Dokumenten."""
         target_url = urljoin(base_url, path)
         
         if not self.scraper_api_key:
@@ -61,7 +65,7 @@ class DocumentScraper:
         documents = []
         
         try:
-            headers = {'User-Agent': random.choice(USER_AGENTS)}
+            headers = {\'User-Agent\': random.choice(USER_AGENTS )}
             logger.info(f"Scraping URL: {target_url} via Premium Proxy")
             response = self.session.get(proxy_url, headers=headers, timeout=180)
             
@@ -70,22 +74,22 @@ class DocumentScraper:
                 logger.error(f"Antwort-Anfang: {response.text[:1000]}") 
                 response.raise_for_status()
             
-            soup = BeautifulSoup(response.content, 'html.parser')
-            links = soup.find_all('a', href=True)
+            soup = BeautifulSoup(response.content, \'html.parser\')
+            links = soup.find_all(\'a\', href=True)
             
             if not links:
                 logger.warning(f"Keine Links auf der Seite gefunden: {target_url}")
                 logger.warning(f"Seiteninhalt-Anfang: {response.text[:1000]}")
 
             for link in links:
-                href = link['href']
-                if href.startswith(('#', 'mailto:', 'javascript:')) or not link.get_text(strip=True):
+                href = link[\'href\']
+                if href.startswith((\'#\', \'mailto:\', \'javascript:\')) or not link.get_text(strip=True):
                     continue
 
                 doc_url = urljoin(target_url, href)
                 doc_title = link.get_text(strip=True)
                 
-                documents.append({'source': base_url, 'url': doc_url, 'title': doc_title})
+                documents.append({\'source\': base_url, \'url\': doc_url, \'title\': doc_title})
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Netzwerkfehler beim Scraping von {target_url}: {e}")
