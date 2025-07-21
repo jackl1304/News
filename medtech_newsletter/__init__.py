@@ -257,7 +257,3 @@ def create_app(config_name='development'):
         scheduler.start_scheduler()
 
     return app
-    # ... (gleiche Login-Logik wie oben)
-    # return render_template("login.html")
-# app.register_blueprint(main_bp)
-
