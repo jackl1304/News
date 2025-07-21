@@ -10,15 +10,15 @@
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul class="flashes list-unstyled">  <!--  Verbesserung: Bootstrap Klassen für die Liste -->
+            <ul class="flashes list-unstyled">
             {% for message in messages %}
-              <li class="alert alert-danger">{{ message }}</li> <!-- Verbesserung: Flash-Nachrichten als Alerts -->
+              <li class="alert alert-danger">{{ message }}</li>
             {% endfor %}
             </ul>
           {% endif %}
         {% endwith %}
 
-        <form method="post" action="{{ url_for('login') }}" class="form-signin mt-4">
+        <form method="post" action="{{ url_for('login') }}" class="mt-4"> <!-- Korrigierter Endpoint -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email:</label>
                 <input type="email" id="email" name="email" class="form-control" required>
