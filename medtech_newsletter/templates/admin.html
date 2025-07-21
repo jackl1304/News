@@ -1,146 +1,28 @@
-{% extends "base.html" %}
-{% block title %}Admin Dashboard{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2">Admin Dashboard</h1>
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary" onclick="manualScraping()">Manuelles Scraping</button>
-        <button type="button" class="btn btn-success" onclick="manualNewsletter()">Newsletter generieren</button>
-    </div>
-</div>
+<h1>Login</h1>
 
-<div class="row mb-4">
-    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><h5 class="card-title text-muted">Benutzer</h5><p class="card-text fs-4 fw-bold">{{ stats.total_subscribers }}</p></div></div></div>
-    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><h5 class="card-title text-muted">Dokumente</h5><p class="card-text fs-4 fw-bold">{{ stats.total_documents }}</p></div></div></div>
-    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><h5 class="card-title text-muted">Änderungen</h5><p class="card-text fs-4 fw-bold">{{ stats.pending_changes }}</p></div></div></div>
-    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><h5 class="card-title text-muted">Newsletter</h5><p class="card-text fs-4 fw-bold">{{ stats.recent_newsletters|length }}</p></div></div></div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-header">Benutzerverwaltung</div>
-            <div class="card-body"><button class="btn btn-outline-primary w-100" onclick="loadUsers()">Benutzerliste anzeigen</button></div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-header">Datenverwaltung</div>
-            <div class="card-body">
-                <button class="btn btn-outline-primary w-100 mb-2" onclick="loadDocuments()">Dokumente anzeigen</button>
-                <button class="btn btn-outline-warning w-100" onclick="loadChanges()">Änderungen anzeigen</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="card shadow-sm">
-            <div class="card-header">Archiv</div>
-            <div class="card-body"><button class="btn btn-outline-primary w-100" onclick="loadNewsletters()">Newsletter-Archiv</button></div>
-        </div>
-    </div>
-</div>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
 
-<div class="modal fade" id="dataModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="dataModalTitle">Daten</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="dataModalBody"></div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+<form method="post" action="{{ url_for('login') }}">  <!-- Korrektur hier: 'login' statt 'main.login' -->
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
 
-{% block scripts %}
-<script>
-    // Manuelle Aktionen
-    async function manualScraping() {
-        if (!confirm('Manuelles Scraping starten?')) return;
-        alert('Scraping wird im Hintergrund gestartet...');
-        const response = await fetch('/admin/manual-scraping', { method: 'POST' });
-        const result = await response.json();
-        alert(result.message || result.error);
-    }
-    async function manualNewsletter() {
-        if (!confirm('Newsletter-Generierung starten?')) return;
-        alert('Newsletter-Generierung wird im Hintergrund gestartet...');
-        const response = await fetch('/admin/manual-newsletter', { method: 'POST' });
-        const result = await response.json();
-        alert(result.message || result.error);
-    }
+    <label for="password">Passwort:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
 
-    // Modal-Funktionen
-    const dataModal = new bootstrap.Modal(document.getElementById('dataModal'));
-    
-    async function showModalWithTable(endpoint, title, createTableFunction) {
-        document.getElementById('dataModalTitle').textContent = title;
-        const modalBody = document.getElementById('dataModalBody');
-        modalBody.innerHTML = '<div class="d-flex justify-content-center p-5"><div class="spinner-border" role="status"></div></div>';
-        dataModal.show();
-        try {
-            const response = await fetch(endpoint);
-            const data = await response.json();
-            if (response.ok) {
-                modalBody.innerHTML = data.length > 0 ? createTableFunction(data) : '<p class="text-muted">Keine Einträge gefunden.</p>';
-            } else {
-                modalBody.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-            }
-        } catch (error) {
-            modalBody.innerHTML = `<div class="alert alert-danger">Netzwerkfehler: ${error.message}</div>`;
-        }
-    }
-
-    // Benutzer-Funktionen
-    function editUser(userId) { window.location.href = `/admin/user/edit/${userId}`; }
-    async function deleteUser(userId) {
-        if (!confirm(`Benutzer mit ID ${userId} wirklich löschen?`)) return;
-        const response = await fetch(`/admin/user/delete/${userId}`, { method: 'POST' });
-        const result = await response.json();
-        alert(result.message || result.error);
-        loadUsers();
-    }
-    function loadUsers() {
-        showModalWithTable('/admin/users', 'Benutzerverwaltung', data => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>E-Mail</th><th>Admin</th><th>Aktionen</th></tr></thead><tbody>`;
-            data.forEach(user => {
-                let deleteBtn = user.is_admin ? '' : `<button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})">Löschen</button>`;
-                table += `<tr><td>${user.id}</td><td>${user.email}</td><td>${user.is_admin ? 'Ja' : 'Nein'}</td><td><button class="btn btn-sm btn-outline-primary me-2" onclick="editUser(${user.id})">Bearbeiten</button>${deleteBtn}</td></tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-
-    // Daten-Anzeige Funktionen
-    function loadDocuments() {
-        showModalWithTable('/admin/documents', 'Überwachte Dokumente', data => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Quelle</th><th>Titel</th><th>URL</th></tr></thead><tbody>`;
-            data.forEach(doc => {
-                table += `<tr><td>${doc.id}</td><td>${new URL(doc.source).hostname}</td><td>${doc.title}</td><td><a href="${doc.url}" target="_blank">Link</a></td></tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-    function loadChanges() {
-        showModalWithTable('/admin/changes', 'Erkannte Änderungen', data => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Doc ID</th><th>Zusammenfassung</th><th>Status</th></tr></thead><tbody>`;
-            data.forEach(c => {
-                table += `<tr><td>${c.id}</td><td>${c.document_id}</td><td>${c.change_summary}</td><td>${c.processed ? 'Verarbeitet' : 'Neu'}</td></tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-    function loadNewsletters() {
-        showModalWithTable('/admin/newsletters', 'Newsletter-Archiv', data => {
-            let table = `<div class="table-responsive"><table class="table table-striped table-sm"><thead><tr><th>ID</th><th>Titel</th><th>Empfänger</th><th>Erstellt</th><th>Aktion</th></tr></thead><tbody>`;
-            data.forEach(nl => {
-                table += `<tr><td>${nl.id}</td><td>${nl.title}</td><td>${nl.recipient_count}</td><td>${new Date(nl.generated_at).toLocaleDateString('de-DE')}</td><td><a href="/newsletter/${nl.id}" class="btn btn-sm btn-outline-primary" target="_blank">Anzeigen</a></td></tr>`;
-            });
-            return table + `</tbody></table></div>`;
-        });
-    }
-</script>
-{% endblock %}
+    <
